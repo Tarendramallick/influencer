@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,6 +12,8 @@ const contentCategories = ["Fashion", "Tech", "Fitness", "Food", "Travel", "Beau
 export default function ProfileSetupPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("")
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     instagramLink: "",
@@ -26,6 +27,11 @@ export default function ProfileSetupPage() {
     bankDetails: "",
     upiId: "",
   })
+
+  useEffect(() => {
+    setMounted(true)
+    setEmail(localStorage.getItem("email") || "")
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -64,6 +70,8 @@ export default function ProfileSetupPage() {
     }
   }
 
+  if (!mounted) return null
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto">
@@ -92,7 +100,7 @@ export default function ProfileSetupPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Email</label>
-                  <Input type="email" value={localStorage.getItem("email") || ""} disabled />
+                  <Input type="email" value={email} disabled />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Phone</label>

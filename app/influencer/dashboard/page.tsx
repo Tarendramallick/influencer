@@ -26,13 +26,21 @@ export default function InfluencerDashboard() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [stats, setStats] = useState<Stats>({ totalApplications: 0, activeApplications: 0, approvedCount: 0 })
   const [loading, setLoading] = useState(true)
+  const [userId, setUserId] = useState("")
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const storedUserId = localStorage.getItem("userId")
+        if (!storedUserId) {
+          console.error("User ID not found")
+          return
+        }
+        setUserId(storedUserId)
+
         const [campaignsRes, statsRes] = await Promise.all([
           fetch("/api/campaigns"),
-          fetch(`/api/applications?influencerId=${localStorage.getItem("userId")}`),
+          fetch(`/api/applications?influencerId=${storedUserId}`),
         ])
 
         if (campaignsRes.ok) {

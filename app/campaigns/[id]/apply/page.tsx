@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams, useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -10,18 +10,22 @@ export default function ApplyCampaignPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [userId, setUserId] = useState("")
+
+  useEffect(() => {
+    setUserId(localStorage.getItem("userId") || "")
+  }, [])
 
   const handleApply = async () => {
     setLoading(true)
 
     try {
-      const influencerId = localStorage.getItem("userId")
       const res = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           campaignId: params.id,
-          influencerId,
+          influencerId: userId,
         }),
       })
 
@@ -57,7 +61,7 @@ export default function ApplyCampaignPage() {
               <p className="text-sm text-muted-foreground">
                 By applying, you confirm that your profile information is accurate and up-to-date.
               </p>
-              <Button onClick={handleApply} className="w-full" disabled={loading}>
+              <Button onClick={handleApply} className="w-full" disabled={loading || !userId}>
                 {loading ? "Submitting..." : "Submit Application"}
               </Button>
               <Button variant="outline" className="w-full bg-transparent" onClick={() => router.back()}>

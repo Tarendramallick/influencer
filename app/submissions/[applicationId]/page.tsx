@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation"
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,11 @@ export default function SubmitContentPage() {
   const [videoUrl, setVideoUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [userId, setUserId] = useState("")
+
+  useEffect(() => {
+    setUserId(localStorage.getItem("userId") || "")
+  }, [])
 
   const handleLinkChange = (index: number, value: string) => {
     const newLinks = [...contentLinks]
@@ -34,13 +39,12 @@ export default function SubmitContentPage() {
     setLoading(true)
 
     try {
-      const influencerId = localStorage.getItem("userId")
       const res = await fetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           applicationId: params.applicationId,
-          influencerId,
+          influencerId: userId,
           contentLinks: contentLinks.filter((link) => link.trim() !== ""),
           videoUrl,
         }),
@@ -120,7 +124,7 @@ export default function SubmitContentPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading || !userId}>
                 {loading ? "Submitting..." : "Submit Content"}
               </Button>
             </form>
